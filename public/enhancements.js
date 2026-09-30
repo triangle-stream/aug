@@ -87,6 +87,12 @@
     }
   }
 
+  if (isAdmin) return;
+
+  const routeStyle = document.createElement('style');
+  routeStyle.textContent = '.route-line{opacity:0!important}.route-line-real{stroke:#595aa3;stroke-opacity:.82;stroke-linecap:round;stroke-linejoin:round}';
+  document.head.appendChild(routeStyle);
+
   function patchLeaflet() {
     if (!window.L?.map || window.L.map.__huntPatched) return;
     const original = window.L.map;
@@ -110,6 +116,7 @@
     patchLeaflet();
     if (window.L?.map?.__huntPatched) clearInterval(leafletTimer);
   }, 50);
+  setTimeout(() => clearInterval(leafletTimer), 5000);
 
   function parseTarget() {
     const coordinate = document.querySelector('.coordinate-copy strong')?.textContent?.trim();
