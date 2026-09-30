@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#120f14" />
+  <meta name="theme-color" content="#f8dfe7" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>48 ore · La caccia</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="preconnect" href="https://tile.openstreetmap.org" />
@@ -20,12 +20,16 @@
 <body>
   <div class="ambient ambient-one"></div>
   <div class="ambient ambient-two"></div>
+  <div class="ambient ambient-three"></div>
+  <div class="page-doodle doodle-one" aria-hidden="true">✦</div>
+  <div class="page-doodle doodle-two" aria-hidden="true">♡</div>
+  <div class="page-doodle doodle-three" aria-hidden="true">☻</div>
 
   <main class="app-shell">
     <header class="topbar">
       <div class="brand" aria-label="La caccia">
         <span class="brand-mark">✦</span>
-        <span>48 ore</span>
+        <span>la tua caccia · 48 ore</span>
       </div>
       <div id="timer" class="timer-pill" aria-live="polite"></div>
     </header>
@@ -33,7 +37,7 @@
     <section id="app" class="stage" aria-live="polite">
       <div class="loading-card">
         <span class="spinner"></span>
-        <p>Sto preparando tutto…</p>
+        <p>Sto nascondendo le ultime cose…</p>
       </div>
     </section>
   </main>
@@ -47,14 +51,14 @@
   <aside id="chatPanel" class="chat-panel" aria-hidden="true">
     <header class="chat-header">
       <div>
-        <span class="chat-kicker">filo diretto</span>
+        <span class="chat-kicker">noi due, mentre giochi</span>
         <h2>Messaggi</h2>
       </div>
       <button id="chatClose" class="icon-button" aria-label="Chiudi chat">×</button>
     </header>
     <div id="chatMessages" class="chat-messages"></div>
     <form id="chatForm" class="chat-compose">
-      <textarea id="chatInput" rows="1" maxlength="500" placeholder="Scrivi qualcosa…" aria-label="Messaggio"></textarea>
+      <textarea id="chatInput" rows="1" maxlength="500" placeholder="Scrivimi…" aria-label="Messaggio"></textarea>
       <button class="send-button" aria-label="Invia messaggio">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 20 18-8L3 4v6l13 2-13 2z"/></svg>
       </button>
