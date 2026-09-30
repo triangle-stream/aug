@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#121012" />
+  <title>Control room · 48 ore</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .admin-shell{width:min(960px,calc(100% - 28px));margin:auto;padding:34px 0 70px}.admin-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:22px}.admin-head h1{font-size:clamp(2.2rem,8vw,4.4rem)}.admin-kicker{margin:0 0 8px;text-transform:uppercase;letter-spacing:.16em;font-size:.65rem;color:#d89ab0}.admin-grid{display:grid;gap:14px}.admin-card{padding:18px;border:1px solid rgba(255,255,255,.09);border-radius:22px;background:rgba(255,255,255,.06);backdrop-filter:blur(18px)}.admin-card h2{margin:0 0 14px;font:600 1.25rem 'Playfair Display',serif}.admin-card input,.admin-card textarea{width:100%;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(0,0,0,.2);color:white;padding:12px;outline:none}.admin-card button{border:0;border-radius:13px;padding:11px 14px;background:#f2e7e8;color:#171116;font-weight:700;cursor:pointer}.admin-auth{display:grid;grid-template-columns:1fr auto;gap:8px}.admin-chat{height:440px;display:grid;grid-template-rows:1fr auto}.admin-messages{overflow:auto;padding:4px}.admin-compose{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.admin-compose textarea{min-height:50px;resize:none}.admin-state{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow:auto;max-height:440px;color:rgba(255,255,255,.7)}.admin-status{font-size:.75rem;color:rgba(255,255,255,.55)}@media(min-width:760px){.admin-grid{grid-template-columns:1.05fr .95fr}.admin-chat-card{grid-row:span 2}}
+  </style>
+</head>
+<body>
+  <main class="admin-shell">
+    <header class="admin-head">
+      <div><p class="admin-kicker">48 ore</p><h1>Control room</h1></div>
+      <span id="adminStatus" class="admin-status">non connesso</span>
+    </header>
+
+    <div class="admin-grid">
+      <section class="admin-card">
+        <h2>Accesso</h2>
+        <div class="admin-auth"><input id="token" type="password" autocomplete="current-password" placeholder="Admin token" /><button id="connect">Connetti</button></div>
+      </section>
+
+      <section class="admin-card admin-chat-card">
+        <h2>Chat con lei</h2>
+        <div class="admin-chat">
+          <div id="adminMessages" class="admin-messages"></div>
+          <form id="adminChatForm" class="admin-compose"><textarea id="adminMessage" maxlength="500" placeholder="Scrivile qualcosa…"></textarea><button>Invia</button></form>
+        </div>
+      </section>
+
+      <section class="admin-card">
+        <h2>Stato partita</h2>
+        <button id="refresh">Aggiorna</button>
+        <pre id="state" class="admin-state">Inserisci il token.</pre>
+      </section>
+    </div>
+  </main>
+  <script type="module" src="/admin.js"></script>
+</body>
+</html>

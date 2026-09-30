@@ -1,0 +1,16 @@
+{
+  "name": "birthday-treasure-hunt",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "db:migrate": "wrangler d1 migrations apply treasure-hunt --local",
+    "db:seed": "wrangler d1 execute treasure-hunt --local --file=./seed.sql",
+    "db:reset": "rm -rf .wrangler/state && npm run db:migrate && npm run db:seed",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "wrangler": "^4.35.0"
+  }
+}

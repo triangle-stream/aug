@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "birthday-treasure-hunt",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-11",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "treasure-hunt",
+      "database_id": "local-placeholder"
+    }
+  ],
+  "vars": {
+    "ADMIN_TOKEN": "change-me-local-admin-token"
+  }
+}
