@@ -1,16 +1,27 @@
-/* Softer, richer layer over the eclectic theme: personal, musical, warm. */
+@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+
+/* Warm handwritten layer: colourful, personal and tactile without feeling childish. */
 :root {
-  --peach-wash: #f3c7ad;
-  --violet-wash: #c8c5e9;
-  --olive-wash: #d8dd9a;
+  --warm-cream: #fff4df;
+  --paper-warm: #fffaf0;
+  --terracotta: #d9785f;
+  --terracotta-dark: #ad5947;
+  --mustard: #e6bb57;
+  --dusty-pink: #d89aa5;
+  --sage-warm: #98a982;
+  --periwinkle: #8b91c8;
+  --ink-warm: #42363a;
+  --plum-warm: #695265;
 }
 
 body {
   background:
-    radial-gradient(circle at 12% 10%, rgba(230,122,94,.18), transparent 26%),
-    radial-gradient(circle at 88% 18%, rgba(102,105,181,.16), transparent 28%),
-    radial-gradient(circle at 54% 92%, rgba(194,202,85,.14), transparent 28%),
-    linear-gradient(155deg, #f8f0e6 0%, #f4ebdf 52%, #f2ede8 100%);
+    radial-gradient(circle at 8% 8%, rgba(230,187,87,.34), transparent 25%),
+    radial-gradient(circle at 92% 14%, rgba(216,154,165,.28), transparent 28%),
+    radial-gradient(circle at 15% 86%, rgba(152,169,130,.24), transparent 27%),
+    radial-gradient(circle at 88% 88%, rgba(139,145,200,.21), transparent 28%),
+    linear-gradient(155deg, #fff2df 0%, #f9e9df 45%, #f4eee1 100%);
+  color: var(--ink-warm);
 }
 
 body::after {
@@ -19,207 +30,449 @@ body::after {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: .18;
+  opacity: .24;
   background-image:
-    linear-gradient(92deg, transparent 0 49.8%, rgba(72,58,65,.035) 50%, transparent 50.2%),
-    radial-gradient(rgba(72,58,65,.22) .5px, transparent .55px);
-  background-size: 100% 100%, 17px 17px;
+    radial-gradient(rgba(82,61,67,.19) .55px, transparent .65px),
+    linear-gradient(112deg, transparent 0 48%, rgba(255,255,255,.36) 49%, transparent 50%);
+  background-size: 15px 15px, 100% 100%;
   mix-blend-mode: multiply;
 }
+
+.ambient { opacity: .23; filter: blur(58px); }
+.ambient-one { background: #e89572; }
+.ambient-two { background: #8795c8; }
+.ambient-three { background: #e5bd5d; }
+
+.page-doodle {
+  font-family: 'Patrick Hand', cursive;
+  color: rgba(94,65,73,.18);
+  font-size: 1.25rem;
+}
+.doodle-one { transform: rotate(-8deg); }
+.doodle-two { font-size: 2.1rem; color: rgba(173,89,71,.18); }
+.doodle-three { transform: rotate(5deg); color: rgba(91,105,73,.16); }
 
 .app-shell { width: min(100%, 720px); }
 
 .topbar {
-  padding: 0 4px;
+  padding: 0 5px;
   margin-bottom: 12px;
 }
 
+.brand {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1rem;
+  letter-spacing: .015em;
+  color: #6a4f58;
+}
 .brand-mark {
-  background: #27243f;
-  color: #fff9ef;
-  border-color: transparent;
-  box-shadow: 4px 4px 0 rgba(230,122,94,.28);
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 12px 15px 11px 14px;
+  background: #6f5b77;
+  color: #fff7e8;
+  font-family: 'Patrick Hand', cursive;
+  font-size: .9rem;
+  box-shadow:
+    4px 4px 0 rgba(230,187,87,.72),
+    0 8px 18px rgba(91,66,76,.12);
+  transform: rotate(-4deg);
 }
 
 .timer-pill {
-  background: rgba(255,250,243,.82);
-  border-color: rgba(74,61,68,.12);
-  box-shadow: 0 8px 22px rgba(76,58,68,.08);
+  background: rgba(255,249,237,.88);
+  border: 1px solid rgba(111,82,92,.11);
+  color: #715966;
+  box-shadow: 0 7px 22px rgba(103,73,84,.08);
 }
 
 .story-card {
-  border-radius: 29px 24px 31px 25px;
-  border-color: rgba(76,58,68,.10);
+  overflow: visible;
+  border-radius: 31px 25px 34px 27px;
+  border: 1px solid rgba(121,83,94,.10);
   background:
-    linear-gradient(145deg, rgba(255,252,247,.96), rgba(250,245,239,.93));
+    radial-gradient(circle at 95% 6%, rgba(230,187,87,.17), transparent 25%),
+    radial-gradient(circle at 3% 91%, rgba(216,154,165,.12), transparent 26%),
+    linear-gradient(145deg, rgba(255,251,241,.98), rgba(255,246,233,.96));
   box-shadow:
-    0 18px 44px rgba(79,57,68,.10),
-    9px 9px 0 rgba(199,196,231,.22);
+    0 20px 48px rgba(99,68,80,.11),
+    10px 10px 0 rgba(139,145,200,.14);
 }
 
 .story-card::before {
   content: '';
   position: absolute;
-  width: 88px;
-  height: 18px;
-  left: 24px;
-  top: -4px;
-  background: rgba(216,221,154,.54);
-  transform: rotate(-2deg);
+  width: 92px;
+  height: 21px;
+  left: 28px;
+  top: -8px;
   border-radius: 2px;
+  background: rgba(230,187,87,.62);
+  box-shadow: inset 0 0 0 1px rgba(132,99,41,.05);
+  transform: rotate(-3deg);
+}
+
+.story-card::after {
+  content: '♪';
+  right: 20px;
+  bottom: 15px;
+  position: absolute;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.35rem;
+  color: rgba(173,89,71,.18);
+  transform: rotate(9deg);
 }
 
 .eyebrow {
   display: inline-flex;
   width: fit-content;
-  padding: 5px 9px;
-  margin-left: -2px;
-  border-radius: 999px;
-  background: rgba(199,196,231,.33);
-  color: #62546f;
+  margin: 0 0 10px -3px;
+  padding: 4px 10px 3px;
+  border-radius: 8px 11px 7px 10px;
+  background: rgba(216,154,165,.24);
+  color: #8f5968;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1rem;
+  line-height: 1;
+  letter-spacing: .01em;
+  text-transform: none;
+  transform: rotate(-1deg);
+}
+
+h1,
+.question-title,
+.reward-copy h1,
+.chat-header h2 {
+  font-family: 'Patrick Hand', cursive;
+  color: #47383d;
+  font-weight: 400;
+  letter-spacing: -.012em;
 }
 
 h1 {
-  color: #312b38;
-  text-wrap: balance;
+  font-size: clamp(2.7rem, 10vw, 4.9rem);
+  line-height: .94;
+}
+
+.question-title {
+  font-size: clamp(2.45rem, 9vw, 4.45rem);
+  line-height: .98;
+}
+
+.lead {
+  color: #765e65;
+  line-height: 1.58;
+}
+.soft-copy {
+  color: #8c737a;
+}
+
+.card-orbit {
+  width: 58px;
+  height: 58px;
+  border: 0;
+  border-radius: 18px 22px 17px 21px;
+  background: rgba(139,145,200,.23);
+  color: #665e9a;
+  box-shadow: 5px 5px 0 rgba(216,154,165,.22);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.25rem;
+  transform: rotate(7deg);
+}
+
+.moon-mark,
+.final-star {
+  border: 0;
+  border-radius: 22px 18px 24px 19px;
+  background: rgba(230,187,87,.34);
+  color: #9b6941;
+  box-shadow: 6px 7px 0 rgba(139,145,200,.16);
+  font-family: 'Patrick Hand', cursive;
+  transform: rotate(-4deg);
+}
+
+.finish-sign {
+  font-family: 'Patrick Hand', cursive;
+  color: var(--terracotta);
+  font-size: 2.5rem;
 }
 
 .question-box {
+  position: relative;
+  margin-top: 30px;
   border: 0;
+  border-radius: 21px 25px 20px 27px;
   background:
-    linear-gradient(135deg, rgba(239,203,181,.38), rgba(255,251,246,.82));
-  box-shadow: inset 0 0 0 1px rgba(156,93,68,.08);
+    radial-gradient(circle at 95% 20%, rgba(230,187,87,.24), transparent 28%),
+    linear-gradient(135deg, rgba(236,184,163,.44), rgba(255,246,231,.90));
+  box-shadow:
+    inset 0 0 0 1px rgba(151,88,67,.08),
+    5px 6px 0 rgba(216,154,165,.11);
+}
+
+.question-box p {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.55rem;
+  line-height: 1.22;
+  color: #594247;
 }
 
 .question-box::after {
   content: '↘';
   position: absolute;
-  right: 16px;
-  top: 12px;
-  color: rgba(92,78,105,.30);
-  font-size: 1.2rem;
+  right: 15px;
+  top: 10px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.45rem;
+  color: rgba(111,91,119,.38);
+}
+
+.question-label,
+.field-label,
+.step-meta {
+  letter-spacing: .015em;
+}
+.question-label {
+  font-family: 'Patrick Hand', cursive;
+  text-transform: none;
+  font-size: .98rem;
+  color: #936f79;
 }
 
 .field-row input {
-  background: rgba(255,255,255,.88);
-  border-color: rgba(79,58,68,.12);
+  background: rgba(255,255,255,.9);
+  border: 1px solid rgba(112,81,91,.12);
+  border-radius: 16px 19px 15px 18px;
+}
+.field-row input:focus {
+  border-color: rgba(173,89,71,.35);
+  box-shadow: 0 0 0 4px rgba(216,154,165,.12);
 }
 
 .round-submit,
 .primary-wide,
 .send-button {
-  background: #34304f;
+  background: #6d596f;
 }
 
 .round-submit {
-  box-shadow: 4px 5px 0 rgba(230,122,94,.30);
+  border-radius: 16px 13px 18px 14px;
+  box-shadow:
+    4px 5px 0 rgba(230,187,87,.64),
+    0 8px 18px rgba(91,66,76,.10);
+  transform: rotate(-2deg);
 }
 
-.progress-dot.done { background: #a7ad68; }
-.progress-dot.active { background: #696bb3; }
+.step-meta {
+  font-family: 'Patrick Hand', cursive;
+  font-size: .95rem;
+  color: #93747d;
+}
+.progress-dot {
+  height: 6px;
+  background: #e2cfd1;
+}
+.progress-dot.done { background: #9dac82; }
+.progress-dot.active {
+  background: #8b91c8;
+  width: 27px;
+}
 
 .step-number {
-  color: rgba(100,103,179,.08);
-  transform: rotate(4deg);
+  font-family: 'Patrick Hand', cursive;
+  color: rgba(139,145,200,.11);
+  font-size: 5.5rem;
+  transform: rotate(6deg);
 }
 
+.reward-screen { gap: 16px; }
+
 .reward-copy {
-  border-radius: 26px 22px 28px 23px;
-  border-color: rgba(76,58,68,.09);
+  position: relative;
+  border-radius: 29px 23px 31px 25px;
+  border: 1px solid rgba(121,83,94,.09);
   background:
-    radial-gradient(circle at 92% 12%, rgba(216,221,154,.28), transparent 27%),
-    rgba(255,250,244,.94);
-  box-shadow: 0 14px 34px rgba(76,58,68,.09);
+    radial-gradient(circle at 92% 13%, rgba(230,187,87,.28), transparent 29%),
+    radial-gradient(circle at 7% 88%, rgba(152,169,130,.13), transparent 28%),
+    linear-gradient(145deg, #fffaf0, #fff3e6);
+  box-shadow:
+    0 15px 38px rgba(91,65,76,.09),
+    -7px 8px 0 rgba(216,154,165,.14);
 }
 
 .reward-copy::before {
-  content: 'found';
+  content: 'trovato';
   position: absolute;
   right: 18px;
-  top: -10px;
-  padding: 4px 9px;
-  border-radius: 4px;
-  font: 500 .58rem 'IBM Plex Mono', monospace;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: #4f4835;
-  background: #d8dd9a;
-  transform: rotate(2deg);
+  top: -11px;
+  padding: 4px 10px 3px;
+  border-radius: 5px;
+  background: #e7bd58;
+  color: #6e5139;
+  font-family: 'Patrick Hand', cursive;
+  font-size: .95rem;
+  letter-spacing: .01em;
+  text-transform: none;
+  transform: rotate(3deg);
+}
+
+.reward-copy h1 {
+  font-size: clamp(2.5rem, 8.8vw, 4.2rem);
+  line-height: .96;
 }
 
 .map-card {
-  border-radius: 27px 22px 29px 24px;
-  border: 3px solid rgba(255,251,245,.9);
+  border-radius: 29px 23px 31px 25px;
+  border: 4px solid rgba(255,250,239,.95);
   box-shadow:
-    0 16px 38px rgba(72,58,65,.12),
-    -6px 7px 0 rgba(230,122,94,.16);
+    0 17px 40px rgba(83,61,71,.13),
+    -7px 8px 0 rgba(217,120,95,.18),
+    7px -5px 0 rgba(139,145,200,.12);
 }
 
 .map-pill,
 .coordinate-copy {
-  background: rgba(255,251,246,.94);
-  border-color: rgba(60,52,56,.08);
+  background: rgba(255,250,239,.95);
+  border-color: rgba(91,70,78,.07);
 }
 
-.route-summary {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
+.pulse-dot {
+  background: var(--terracotta);
+  box-shadow: 0 0 0 5px rgba(217,120,95,.13);
+}
+
+.route-summary small {
+  font-family: 'Patrick Hand', cursive;
+  font-size: .8rem;
+  color: #98717b;
 }
 .route-summary strong {
-  font-size: .75rem;
-  font-weight: 700;
-  color: #3c3540;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #4e3f44;
 }
 .route-summary span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: .62rem;
-  color: #877c82;
+  color: #89747b;
+  font-size: .64rem;
 }
 
 .route-line-real {
-  stroke: #595aa3;
-  stroke-opacity: .82;
+  stroke: #7c72b3;
+  stroke-opacity: .86;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
+.target-marker {
+  background: #d9785f;
+  border-color: #fff4df;
+}
+.route-line { opacity: 0 !important; }
+
+.primary-wide {
+  min-height: 56px;
+  border: 0;
+  border-radius: 17px 20px 16px 19px;
+  color: #fffaf0;
+  box-shadow:
+    0 9px 22px rgba(91,66,76,.13),
+    5px 5px 0 rgba(230,187,87,.42);
+}
+
 .locker-button {
-  background: linear-gradient(135deg, rgba(255,250,244,.96), rgba(199,196,231,.22));
+  border-radius: 18px 21px 17px 20px;
+  background:
+    linear-gradient(135deg, rgba(255,250,239,.98), rgba(139,145,200,.13));
+  border-color: rgba(105,82,101,.10);
+  box-shadow: 5px 6px 0 rgba(152,169,130,.12);
+}
+
+.locker-icon {
+  background: rgba(230,187,87,.28);
+  color: #9c6940;
 }
 
 .secret-card {
+  border-radius: 22px 27px 21px 26px;
   background:
-    radial-gradient(circle at 85% 10%, rgba(194,202,85,.32), transparent 30%),
-    linear-gradient(145deg, #fff9ef, #f5ebe4);
-  box-shadow: 7px 8px 0 rgba(105,107,179,.15);
+    radial-gradient(circle at 88% 10%, rgba(152,169,130,.28), transparent 28%),
+    radial-gradient(circle at 10% 90%, rgba(216,154,165,.20), transparent 27%),
+    linear-gradient(145deg, #fff8e8, #f8ede2);
+  box-shadow:
+    7px 8px 0 rgba(139,145,200,.15),
+    0 12px 30px rgba(91,66,76,.08);
+}
+.secret-card small {
+  font-family: 'Patrick Hand', cursive;
+  font-size: .9rem;
+  text-transform: none;
 }
 
 .chat-fab {
-  background: #34304f;
-  color: #fff8ef;
-  border-color: transparent;
+  border: 0;
+  border-radius: 19px 23px 18px 22px;
+  background: #6d596f;
+  color: #fff8ea;
   box-shadow:
-    0 12px 34px rgba(61,48,58,.22),
-    5px 6px 0 rgba(230,122,94,.28);
+    0 13px 34px rgba(75,54,65,.20),
+    5px 6px 0 rgba(230,187,87,.55);
+  transform: rotate(-1deg);
+}
+
+.chat-unread {
+  background: #d9785f;
+  border-color: #fff1de;
 }
 
 .chat-panel {
   background:
-    radial-gradient(circle at 90% 0%, rgba(199,196,231,.28), transparent 28%),
-    #fbf6f0;
+    radial-gradient(circle at 92% 0%, rgba(216,154,165,.24), transparent 27%),
+    radial-gradient(circle at 6% 98%, rgba(152,169,130,.17), transparent 28%),
+    #fff8ed;
 }
 
+.chat-header {
+  border-bottom-color: rgba(95,70,79,.08);
+}
+.chat-header h2 {
+  font-size: 2rem;
+  line-height: 1;
+}
+.chat-kicker {
+  font-family: 'Patrick Hand', cursive;
+  text-transform: none;
+  letter-spacing: .01em;
+  font-size: .95rem;
+  color: #a06d7a;
+}
+
+.bubble {
+  border-radius: 19px 21px 18px 22px;
+}
 .mine .bubble {
-  background: #5f5f9d;
+  background: #7b709e;
+  color: #fffaf0;
 }
 .theirs .bubble {
-  background: #eee2d7;
+  background: #f0dfd0;
+  color: #4f4146;
+}
+
+.chat-compose textarea {
+  background: #fffdf8;
+  border-color: rgba(100,76,85,.11);
+}
+
+.toast {
+  background: rgba(105,82,101,.94);
+  border-color: rgba(255,255,255,.12);
 }
 
 @media (max-width: 390px) {
-  .story-card { border-radius: 25px 21px 27px 22px; }
-  .reward-copy { border-radius: 23px 20px 25px 21px; }
+  .story-card { border-radius: 27px 22px 29px 24px; }
+  .reward-copy { border-radius: 25px 21px 27px 22px; }
+  h1 { font-size: clamp(2.55rem, 12vw, 4rem); }
+  .question-title { font-size: clamp(2.3rem, 10.5vw, 3.7rem); }
 }
