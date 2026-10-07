@@ -1,4 +1,4 @@
-UPDATE game SET title='Tanti auguri polpetta!' WHERE id=1;
+UPDATE game SET title='Tanti auguri polpetta!', entry_question='', entry_answer_hash='' WHERE id=1;
 
 UPDATE steps
 SET question='non si vede da uno specchio ma puoi leggerla.',
