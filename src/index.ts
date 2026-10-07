@@ -176,13 +176,16 @@ async function activate(req: Request, env: Env) {
   if (Date.now() < new Date(game.birthday_at).getTime()) return json({ error: "Non ancora." }, 403);
   if (await rateLimited(env, "entry")) return json({ error: "Troppi tentativi. Riprova tra un minuto." }, 429);
 
-  const data = await body(req);
-  const answerHash = await sha256(normalize(String(data.answer || "")));
-  const ok = answerHash === game.entry_answer_hash;
-  await env.DB.prepare("INSERT INTO attempts(kind,attempted_at,success) VALUES('entry',?,?)")
-    .bind(nowIso(), ok ? 1 : 0)
-    .run();
-  if (!ok) return json({ error: "Risposta sbagliata." }, 401);
+  const requiresEntryAnswer = Boolean(game.entry_answer_hash);
+  if (requiresEntryAnswer) {
+    const data = await body(req);
+    const answerHash = await sha256(normalize(String(data.answer || "")));
+    const ok = answerHash === game.entry_answer_hash;
+    await env.DB.prepare("INSERT INTO attempts(kind,attempted_at,success) VALUES('entry',?,?)")
+      .bind(nowIso(), ok ? 1 : 0)
+      .run();
+    if (!ok) return json({ error: "Risposta sbagliata." }, 401);
+  }
 
   const token = crypto.randomUUID() + crypto.randomUUID();
   const tokenHash = await sha256(token);
