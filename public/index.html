@@ -7,12 +7,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Tanti auguri polpetta!</title>
+  <base href="/auguri/" />
   <link rel="preconnect" href="https://tile.openstreetmap.org" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="/style.css" />
-  <link rel="stylesheet" href="/pretty.css" />
-  <link rel="stylesheet" href="/polpetta.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="pretty.css" />
+  <link rel="stylesheet" href="polpetta.css" />
 </head>
 <body>
   <main class="app-shell">
@@ -54,10 +55,11 @@
 
   <div id="toast" class="toast hidden" role="status"></div>
 
-  <script src="/leaflet-loader.js"></script>
-  <script src="/enhancements.js"></script>
-  <script src="/routing-fix.js"></script>
-  <script src="/polpetta.js"></script>
-  <script type="module" src="/app.js"></script>
+  <script src="path-prefix.js"></script>
+  <script src="leaflet-loader.js"></script>
+  <script src="enhancements.js"></script>
+  <script src="routing-fix.js"></script>
+  <script src="polpetta.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
