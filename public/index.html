@@ -3,29 +3,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#f6efe4" />
+  <meta name="theme-color" content="#5f584e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>48 ore · La caccia</title>
+  <title>48 ore</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="preconnect" href="https://tile.openstreetmap.org" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="/style.css" />
   <link rel="stylesheet" href="/pretty.css" />
 </head>
 <body>
-  <div class="ambient ambient-one"></div>
-  <div class="ambient ambient-two"></div>
-  <div class="ambient ambient-three"></div>
-  <div class="page-doodle doodle-one" aria-hidden="true">SIDE A</div>
-  <div class="page-doodle doodle-two" aria-hidden="true">〰</div>
-  <div class="page-doodle doodle-three" aria-hidden="true">+ + +</div>
-
   <main class="app-shell">
     <header class="topbar">
-      <div class="brand" aria-label="La caccia">
+      <div class="brand" aria-label="48 ore">
         <span class="brand-mark">48</span>
-        <span>ore / play</span>
+        <span>ore</span>
       </div>
       <div id="timer" class="timer-pill" aria-live="polite"></div>
     </header>
@@ -33,7 +28,7 @@
     <section id="app" class="stage" aria-live="polite">
       <div class="loading-card">
         <span class="spinner"></span>
-        <p>metto su il lato giusto…</p>
+        <p>un momento…</p>
       </div>
     </section>
   </main>
@@ -47,14 +42,14 @@
   <aside id="chatPanel" class="chat-panel" aria-hidden="true">
     <header class="chat-header">
       <div>
-        <span class="chat-kicker">backstage</span>
-        <h2>Messaggi</h2>
+        <span class="chat-kicker">messaggi</span>
+        <h2>Ci sei?</h2>
       </div>
       <button id="chatClose" class="icon-button" aria-label="Chiudi chat">×</button>
     </header>
     <div id="chatMessages" class="chat-messages"></div>
     <form id="chatForm" class="chat-compose">
-      <textarea id="chatInput" rows="1" maxlength="500" placeholder="Scrivi qualcosa…" aria-label="Messaggio"></textarea>
+      <textarea id="chatInput" rows="1" maxlength="500" placeholder="scrivi qualcosa…" aria-label="Messaggio"></textarea>
       <button class="send-button" aria-label="Invia messaggio">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 20 18-8L3 4v6l13 2-13 2z"/></svg>
       </button>
