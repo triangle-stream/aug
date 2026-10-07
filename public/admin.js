@@ -22,7 +22,9 @@ async function refreshState() {
   try {
     const data = await adminApi('/api/admin/state');
     out.textContent = JSON.stringify(data, null, 2);
-    statusLabel.textContent = 'connesso';
+    const gifts = (data.steps || []).filter((step) => step.word_verified_at).length;
+    const total = (data.steps || []).length;
+    statusLabel.textContent = `connesso · ${data.score || 0}/${data.maxScore || 0} pt · ${gifts}/${total} regali`;
   } catch (err) {
     out.textContent = err.message;
     statusLabel.textContent = 'errore accesso';
