@@ -22,15 +22,18 @@ type StepRow = {
   position: number;
   question: string;
   answer_hash: string;
+  points: number;
   reward_title: string;
   reward_text: string | null;
   latitude: number | null;
   longitude: number | null;
   locker_code: string | null;
   locker_revealed_at: string | null;
+  unlock_word_hash: string | null;
   unlocked_at: string | null;
   completed_at: string | null;
   reward_acknowledged_at: string | null;
+  word_verified_at: string | null;
 };
 
 type MessageRow = {
@@ -62,6 +65,10 @@ function cookie(req: Request, name: string) {
 
 async function getGame(env: Env) {
   return env.DB.prepare("SELECT * FROM game WHERE id=1").first<GameRow>();
+}
+
+async function getSteps(env: Env) {
+  return (await env.DB.prepare("SELECT * FROM steps ORDER BY position").all<StepRow>()).results;
 }
 
 async function requireSession(req: Request, env: Env) {
@@ -114,14 +121,18 @@ async function status(env: Env, authorized: boolean) {
     return json(base);
   }
 
-  const steps = (await env.DB.prepare("SELECT * FROM steps ORDER BY position").all<StepRow>()).results;
-  const acknowledged = steps.filter((step) => !!step.reward_acknowledged_at).length;
-  const current = steps.find((step) => !step.reward_acknowledged_at) || null;
+  const steps = await getSteps(env);
+  const score = steps.filter((step) => !!step.completed_at).reduce((sum, step) => sum + Number(step.points || 0), 0);
+  const maxScore = steps.reduce((sum, step) => sum + Number(step.points || 0), 0);
+  const giftsFound = steps.filter((step) => !!step.word_verified_at).length;
+  const current = steps.find((step) => !step.word_verified_at) || null;
 
   base.progress = {
     total: steps.length,
-    completed: acknowledged,
+    giftsFound,
     current: current?.position ?? steps.length,
+    score,
+    maxScore,
   };
 
   if (!current || game.completed_at) {
@@ -135,12 +146,14 @@ async function status(env: Env, authorized: boolean) {
       position: current.position,
       phase: "question",
       question: current.question,
+      points: Number(current.points || 0),
     };
   } else {
     base.currentStep = {
       id: current.id,
       position: current.position,
       phase: "reward",
+      points: Number(current.points || 0),
       completedAt: current.completed_at,
       reward: {
         title: current.reward_title,
@@ -150,6 +163,7 @@ async function status(env: Env, authorized: boolean) {
         hasLockerCode: !!current.locker_code,
         lockerCodeRevealed: !!current.locker_revealed_at,
       },
+      asksForWord: !!current.unlock_word_hash,
     };
   }
 
@@ -196,14 +210,14 @@ async function answerStep(req: Request, env: Env, id: number) {
   const step = await env.DB.prepare("SELECT * FROM steps WHERE id=?").bind(id).first<StepRow>();
   if (!step) return json({ error: "Step inesistente." }, 404);
 
-  const previous = step.position > 1
-    ? await env.DB.prepare("SELECT reward_acknowledged_at FROM steps WHERE position=?")
-        .bind(step.position - 1)
-        .first<{ reward_acknowledged_at: string | null }>()
-    : { reward_acknowledged_at: "first" };
+  if (step.position > 1) {
+    const previous = await env.DB.prepare("SELECT word_verified_at FROM steps WHERE position=?")
+      .bind(step.position - 1)
+      .first<{ word_verified_at: string | null }>();
+    if (!previous?.word_verified_at) return json({ error: "Prima devi trovare la parola del regalo precedente." }, 403);
+  }
 
-  if (!previous?.reward_acknowledged_at) return json({ error: "Questo step è ancora bloccato." }, 403);
-  if (step.completed_at) return json({ ok: true, alreadyCompleted: true });
+  if (step.completed_at) return json({ ok: true, alreadyCompleted: true, points: step.points });
 
   const data = await body(req);
   const ok = (await sha256(normalize(String(data.answer || "")))) === step.answer_hash;
@@ -218,33 +232,46 @@ async function answerStep(req: Request, env: Env, id: number) {
     .bind(ts, ts, id)
     .run();
 
-  return json({ ok: true });
+  return json({ ok: true, points: Number(step.points || 0) });
 }
 
-async function acknowledgeReward(req: Request, env: Env, id: number) {
+async function verifyWord(req: Request, env: Env, id: number) {
   if (!(await requireSession(req, env))) return json({ error: "Sessione non valida." }, 401);
 
   const game = await getGame(env);
-  if (!game?.expires_at) return json({ error: "Gioco non iniziato." }, 409);
+  if (!game?.started_at || !game.expires_at) return json({ error: "Gioco non iniziato." }, 409);
   if (Date.now() > new Date(game.expires_at).getTime() && !game.completed_at) return json({ error: "Il tempo è scaduto." }, 410);
+  if (await rateLimited(env, "word", id)) return json({ error: "Troppi tentativi. Aspetta un minuto." }, 429);
 
   const step = await env.DB.prepare("SELECT * FROM steps WHERE id=?").bind(id).first<StepRow>();
   if (!step) return json({ error: "Step inesistente." }, 404);
-  if (!step.completed_at) return json({ error: "Devi prima risolvere lo step." }, 403);
+  if (!step.completed_at) return json({ error: "Devi prima rispondere bene alla domanda." }, 403);
+  if (step.word_verified_at) return json({ ok: true, alreadyVerified: true });
+  if (!step.unlock_word_hash) return json({ error: "Nessuna parola configurata per questo regalo." }, 409);
 
-  if (!step.reward_acknowledged_at) {
-    const ts = nowIso();
-    await env.DB.prepare("UPDATE steps SET reward_acknowledged_at=? WHERE id=? AND reward_acknowledged_at IS NULL")
-      .bind(ts, id)
-      .run();
+  const data = await body(req);
+  const ok = (await sha256(normalize(String(data.word || "")))) === step.unlock_word_hash;
 
-    const remaining = await env.DB.prepare("SELECT COUNT(*) c FROM steps WHERE reward_acknowledged_at IS NULL").first<{ c: number }>();
-    if ((remaining?.c || 0) === 0) {
-      await env.DB.prepare("UPDATE game SET completed_at=COALESCE(completed_at,?) WHERE id=1").bind(ts).run();
-    }
+  await env.DB.prepare("INSERT INTO attempts(kind,step_id,attempted_at,success) VALUES('word',?,?,?)")
+    .bind(id, nowIso(), ok ? 1 : 0)
+    .run();
+
+  if (!ok) return json({ error: "Non è la parola giusta." }, 401);
+
+  const ts = nowIso();
+  await env.DB.prepare(
+    "UPDATE steps SET word_verified_at=?, reward_acknowledged_at=COALESCE(reward_acknowledged_at,?) WHERE id=?",
+  )
+    .bind(ts, ts, id)
+    .run();
+
+  const remaining = await env.DB.prepare("SELECT COUNT(*) c FROM steps WHERE word_verified_at IS NULL").first<{ c: number }>();
+  const complete = (remaining?.c || 0) === 0;
+  if (complete) {
+    await env.DB.prepare("UPDATE game SET completed_at=COALESCE(completed_at,?) WHERE id=1").bind(ts).run();
   }
 
-  return json({ ok: true });
+  return json({ ok: true, complete });
 }
 
 async function revealLocker(req: Request, env: Env, id: number) {
@@ -305,10 +332,12 @@ async function adminState(req: Request, env: Env) {
   if (!adminOk(req, env)) return json({ error: "Unauthorized" }, 401);
   const game = await getGame(env);
   const steps = (await env.DB.prepare(
-    "SELECT id,position,question,reward_title,completed_at,reward_acknowledged_at,locker_revealed_at,locker_code FROM steps ORDER BY position",
+    "SELECT id,position,question,points,reward_title,completed_at,word_verified_at,reward_acknowledged_at,locker_revealed_at,locker_code FROM steps ORDER BY position",
   ).all()).results;
-  const attempts = (await env.DB.prepare("SELECT * FROM attempts ORDER BY id DESC LIMIT 50").all()).results;
-  return json({ game, steps, attempts });
+  const attempts = (await env.DB.prepare("SELECT * FROM attempts ORDER BY id DESC LIMIT 80").all()).results;
+  const scoreRow = await env.DB.prepare("SELECT COALESCE(SUM(points),0) score FROM steps WHERE completed_at IS NOT NULL").first<{ score: number }>();
+  const maxRow = await env.DB.prepare("SELECT COALESCE(SUM(points),0) maxScore FROM steps").first<{ maxScore: number }>();
+  return json({ game, score: scoreRow?.score || 0, maxScore: maxRow?.maxScore || 0, steps, attempts });
 }
 
 export default {
@@ -323,8 +352,8 @@ export default {
     const answerMatch = url.pathname.match(/^\/api\/steps\/(\d+)\/answer$/);
     if (answerMatch && req.method === "POST") return answerStep(req, env, Number(answerMatch[1]));
 
-    const continueMatch = url.pathname.match(/^\/api\/steps\/(\d+)\/continue$/);
-    if (continueMatch && req.method === "POST") return acknowledgeReward(req, env, Number(continueMatch[1]));
+    const wordMatch = url.pathname.match(/^\/api\/steps\/(\d+)\/word$/);
+    if (wordMatch && req.method === "POST") return verifyWord(req, env, Number(wordMatch[1]));
 
     const lockerMatch = url.pathname.match(/^\/api\/steps\/(\d+)\/locker$/);
     if (lockerMatch && req.method === "POST") return revealLocker(req, env, Number(lockerMatch[1]));
@@ -332,8 +361,6 @@ export default {
     if (url.pathname === "/api/admin/state" && req.method === "GET") return adminState(req, env);
     if (url.pathname === "/api/admin/chat" && req.method === "GET") return getAdminChat(req, env);
     if (url.pathname === "/api/admin/chat" && req.method === "POST") return postAdminChat(req, env);
-
-    // Backward-compatible alias from the first prototype.
     if (url.pathname === "/api/admin/notify" && req.method === "POST") return postAdminChat(req, env);
 
     return env.ASSETS.fetch(req);
