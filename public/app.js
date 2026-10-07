@@ -47,13 +47,13 @@ function showToast(message) {
   toastHandle = setTimeout(() => {
     toast.classList.remove('visible');
     setTimeout(() => toast.classList.add('hidden'), 250);
-  }, 2600);
+  }, 2800);
 }
 
 function renderTimer() {
   clearInterval(timerHandle);
   if (!state?.authorized || !state?.expiresAt || state?.completedAt) {
-    timer.textContent = state?.completedAt ? 'completata ✦' : '';
+    timer.textContent = state?.completedAt ? 'finita' : '';
     timer.classList.toggle('hidden', !timer.textContent);
     return;
   }
@@ -76,6 +76,23 @@ function renderTimer() {
   timerHandle = setInterval(tick, 1000);
 }
 
+function scoreStrip() {
+  const p = state?.progress;
+  if (!p) return '';
+  return `
+    <div class="score-strip" aria-label="Punteggio e regali">
+      <div class="score-cell">
+        <span class="score-label">punti</span>
+        <strong>${p.score}<small>/${p.maxScore}</small></strong>
+      </div>
+      <div class="score-line"><span style="width:${p.maxScore ? Math.round((p.score / p.maxScore) * 100) : 0}%"></span></div>
+      <div class="score-cell score-gifts">
+        <span class="score-label">regali</span>
+        <strong>${p.giftsFound}<small>/${p.total}</small></strong>
+      </div>
+    </div>`;
+}
+
 function progressDots(progress) {
   if (!progress?.total) return '';
   return Array.from({ length: progress.total }, (_, i) => {
@@ -87,20 +104,20 @@ function progressDots(progress) {
 
 function entryView() {
   return `
-    <article class="story-card entrance-card">
-      <div class="card-orbit">✦</div>
-      <p class="eyebrow">una cosa per te</p>
+    <article class="story-card entrance-card hero-card">
+      <div class="hero-index">00</div>
+      <p class="eyebrow">si comincia da qui</p>
       <h1>${esc(state.title)}</h1>
-      <p class="lead">Prima di iniziare c'è una piccola porta da aprire.</p>
+      <p class="lead">Hai 48 ore. Una domanda alla volta, un posto alla volta.</p>
       <div class="question-box">
-        <span class="question-label">La prima domanda</span>
+        <span class="question-label">Per entrare</span>
         <p>${esc(state.entryQuestion || '')}</p>
       </div>
       <form id="activate" class="answer-form">
-        <label class="field-label" for="entryAnswer">La tua risposta</label>
+        <label class="field-label" for="entryAnswer">risposta</label>
         <div class="field-row">
-          <input id="entryAnswer" name="answer" autocomplete="off" autocapitalize="sentences" placeholder="Scrivila qui…" required />
-          <button class="round-submit" aria-label="Apri">→</button>
+          <input id="entryAnswer" name="answer" autocomplete="off" autocapitalize="sentences" placeholder="scrivila qui…" required />
+          <button class="round-submit" aria-label="Inizia">→</button>
         </div>
         <p class="form-error" id="entryError"></p>
       </form>
@@ -111,50 +128,54 @@ function waitingView() {
   const when = new Date(state.birthdayAt).toLocaleString('it-IT', { dateStyle: 'long', timeStyle: 'short' });
   return `
     <article class="story-card centered-card">
-      <div class="moon-mark">✦</div>
       <p class="eyebrow">non ancora</p>
-      <h1>C'è un momento giusto.</h1>
-      <p class="lead">Questa porta si apre il <strong>${esc(when)}</strong>.</p>
+      <h1>Non parte prima del tempo.</h1>
+      <p class="lead">Si apre il <strong>${esc(when)}</strong>.</p>
     </article>`;
 }
 
 function expiredView() {
   return `
     <article class="story-card centered-card">
-      <div class="moon-mark">⌛</div>
-      <p class="eyebrow">48 ore</p>
-      <h1>Il tempo è finito.</h1>
-      <p class="lead">La caccia si è fermata qui.</p>
+      ${scoreStrip()}
+      <p class="eyebrow">tempo</p>
+      <h1>Le 48 ore sono finite.</h1>
+      <p class="lead">Il percorso si è fermato qui.</p>
     </article>`;
 }
 
 function completedView() {
+  const p = state?.progress || {};
   return `
     <article class="story-card centered-card finish-card">
-      <div class="final-star">✦</div>
-      <p class="eyebrow">fine della caccia</p>
-      <h1>Ce l'hai fatta.</h1>
-      <p class="lead">Tutti i posti, tutte le risposte, tutti i piccoli pezzi. Questo era l'ultimo.</p>
-      <div class="finish-sign">♡</div>
+      ${scoreStrip()}
+      <p class="eyebrow">tutto trovato</p>
+      <h1>${p.score || 0} punti. Tutti i regali.</h1>
+      <p class="lead">Hai chiuso tutte le tappe e trovato tutte le parole.</p>
+      <div class="final-placeholder">
+        <span>fine del percorso</span>
+        <p>Qui succederà l’ultima cosa. La decidiamo dopo.</p>
+      </div>
     </article>`;
 }
 
 function questionView(step) {
   return `
     <article class="story-card step-card">
+      ${scoreStrip()}
       <div class="step-meta">
-        <span>step ${step.position} di ${state.progress.total}</span>
+        <span>domanda ${step.position} / ${state.progress.total}</span>
         <div class="progress-dots">${progressDots(state.progress)}</div>
       </div>
       <div class="step-number">${String(step.position).padStart(2, '0')}</div>
-      <p class="eyebrow">trova la risposta</p>
+      <p class="eyebrow">vale ${step.points} punti</p>
       <h1 class="question-title">${esc(step.question)}</h1>
-      <p class="soft-copy">Non serve avere fretta. La risposta giusta apre il prossimo posto.</p>
+      <p class="soft-copy">Se è giusta, prendi i punti e compare il posto dove andare.</p>
       <form id="stepForm" data-step="${step.id}" class="answer-form bottom-form">
-        <label class="field-label" for="stepAnswer">Risposta</label>
+        <label class="field-label" for="stepAnswer">risposta</label>
         <div class="field-row">
-          <input id="stepAnswer" name="answer" autocomplete="off" placeholder="Prova…" required />
-          <button class="round-submit" aria-label="Sblocca">→</button>
+          <input id="stepAnswer" name="answer" autocomplete="off" placeholder="prova…" required />
+          <button class="round-submit" aria-label="Conferma">→</button>
         </div>
         <p class="form-error" id="stepError"></p>
       </form>
@@ -167,23 +188,24 @@ function rewardView(step) {
   const locker = reward?.hasLockerCode
     ? reward.lockerCodeRevealed
       ? `<div class="locker-state"><span>✓</span><p>Il codice del locker è già stato mostrato.</p></div>`
-      : `<button id="lockerButton" class="locker-button"><span class="locker-icon">⌗</span><span><strong>Sono davanti al locker</strong><small>Mostrami il codice una sola volta</small></span></button><div id="lockerSecret"></div>`
+      : `<button id="lockerButton" class="locker-button"><span class="locker-icon">#</span><span><strong>Sono davanti al locker</strong><small>mostrami il codice una volta sola</small></span></button><div id="lockerSecret"></div>`
     : '';
 
   return `
     <article class="reward-screen">
       <div class="reward-copy">
+        ${scoreStrip()}
         <div class="step-meta light-meta">
-          <span>step ${step.position} · sbloccato</span>
+          <span>domanda ${step.position} risolta</span>
           <div class="progress-dots">${progressDots(state.progress)}</div>
         </div>
-        <p class="eyebrow">hai trovato il posto</p>
-        <h1>${esc(reward?.title || 'Il prossimo regalo')}</h1>
+        <p class="points-earned">+${step.points} punti</p>
+        <h1>${esc(reward?.title || 'Prossimo posto')}</h1>
         <p class="lead">${esc(reward?.text || '')}</p>
       </div>
 
       ${hasCoords ? `
-        <div class="map-card">
+        <div class="map-card" data-latitude="${Number(reward.latitude)}" data-longitude="${Number(reward.longitude)}">
           <div id="map" class="map"></div>
           <div class="map-overlay-top">
             <button id="locateButton" class="map-pill"><span class="pulse-dot"></span><span id="locationLabel">Usa la mia posizione</span></button>
@@ -194,13 +216,23 @@ function rewardView(step) {
               <small>destinazione</small>
               <strong>${Number(reward.latitude).toFixed(5)}, ${Number(reward.longitude).toFixed(5)}</strong>
             </div>
-            <a class="external-map" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${reward.latitude},${reward.longitude}`)}" target="_blank" rel="noopener" aria-label="Apri indicazioni">↗</a>
           </div>
         </div>` : ''}
 
       <div class="reward-actions">
         ${locker}
-        <button id="continueButton" class="primary-wide">${step.position === state.progress.total ? 'Ho trovato anche questo' : 'Ho trovato il regalo · continua'}</button>
+        <div class="word-card">
+          <span class="word-kicker">nel regalo c’è un bigliettino</span>
+          <h2>${step.position === state.progress.total ? 'Qual è l’ultima parola?' : 'Qual è la parola?'}</h2>
+          <p>${step.position === state.progress.total
+            ? 'Inseriscila qui per chiudere il percorso.'
+            : 'Inseriscila qui: è la chiave della prossima domanda.'}</p>
+          <form id="wordForm" data-step="${step.id}" class="word-form">
+            <input id="giftWord" name="word" autocomplete="off" placeholder="la parola…" required />
+            <button>continua →</button>
+          </form>
+          <p class="form-error" id="wordError"></p>
+        </div>
       </div>
     </article>`;
 }
@@ -249,7 +281,7 @@ function bindEntry() {
     error.textContent = '';
     try {
       await api('/api/activate', { method: 'POST', body: JSON.stringify({ answer: new FormData(form).get('answer') }) });
-      showToast('La caccia è iniziata ✦');
+      showToast('Si parte.');
       await load();
     } catch (err) {
       error.textContent = err.message;
@@ -267,8 +299,11 @@ function bindQuestion(step) {
     button.disabled = true;
     error.textContent = '';
     try {
-      await api(`/api/steps/${step.id}/answer`, { method: 'POST', body: JSON.stringify({ answer: new FormData(form).get('answer') }) });
-      showToast('Giusta. Hai sbloccato un posto ✦');
+      const result = await api(`/api/steps/${step.id}/answer`, {
+        method: 'POST',
+        body: JSON.stringify({ answer: new FormData(form).get('answer') }),
+      });
+      showToast(`Giusta. +${result.points || step.points} punti.`);
       await load();
     } catch (err) {
       error.textContent = err.message;
@@ -286,7 +321,7 @@ function bindReward(step) {
   }
 
   document.querySelector('#lockerButton')?.addEventListener('click', async () => {
-    if (!confirm('Il codice verrà mostrato una sola volta. Confermi di essere davanti al locker?')) return;
+    if (!confirm('Il codice verrà mostrato una sola volta. Sei davanti al locker?')) return;
     const button = document.querySelector('#lockerButton');
     button.disabled = true;
     try {
@@ -300,15 +335,24 @@ function bindReward(step) {
     }
   });
 
-  document.querySelector('#continueButton')?.addEventListener('click', async (event) => {
-    event.currentTarget.disabled = true;
+  const wordForm = document.querySelector('#wordForm');
+  wordForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const error = document.querySelector('#wordError');
+    const button = wordForm.querySelector('button');
+    button.disabled = true;
+    error.textContent = '';
     try {
-      await api(`/api/steps/${step.id}/continue`, { method: 'POST' });
+      const result = await api(`/api/steps/${step.id}/word`, {
+        method: 'POST',
+        body: JSON.stringify({ word: new FormData(wordForm).get('word') }),
+      });
+      showToast(result.complete ? 'Trovata. Hai chiuso il percorso.' : 'Trovata. Prossima domanda sbloccata.');
       await load();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
-      showToast(err.message);
-      event.currentTarget.disabled = false;
+      error.textContent = err.message;
+      button.disabled = false;
     }
   });
 }
@@ -318,7 +362,7 @@ function markerIcon(kind) {
     className: '',
     html: kind === 'user'
       ? '<div class="user-marker"><span></span></div>'
-      : '<div class="target-marker"><span>✦</span></div>',
+      : '<div class="target-marker"><span>•</span></div>',
     iconSize: kind === 'user' ? [26, 26] : [44, 44],
     iconAnchor: kind === 'user' ? [13, 13] : [22, 38],
   });
@@ -332,11 +376,11 @@ function initMap(target) {
   const mapNode = document.querySelector('#map');
   if (!mapNode) return;
 
-  map = L.map(mapNode, { zoomControl: false, attributionControl: false, preferCanvas: true }).setView([target.latitude, target.longitude], 15);
+  map = L.map(mapNode, { zoomControl: false, attributionControl: false, preferCanvas: true })
+    .setView([target.latitude, target.longitude], 15);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
   L.control.attribution({ position: 'bottomleft', prefix: false }).addAttribution('© OpenStreetMap').addTo(map);
   targetMarker = L.marker([target.latitude, target.longitude], { icon: markerIcon('target'), zIndexOffset: 1000 }).addTo(map);
-
   setTimeout(() => map?.invalidateSize(), 100);
 }
 
@@ -392,10 +436,19 @@ function updateLocation(coords) {
   if (!userMarker) userMarker = L.marker(latlng, { icon: markerIcon('user'), zIndexOffset: 1200 }).addTo(map);
   else userMarker.setLatLng(latlng);
 
-  if (!accuracyCircle) accuracyCircle = L.circle(latlng, { radius: coords.accuracy || 20, className: 'accuracy-circle', interactive: false }).addTo(map);
+  if (!accuracyCircle) accuracyCircle = L.circle(latlng, {
+    radius: coords.accuracy || 20,
+    className: 'accuracy-circle',
+    interactive: false,
+  }).addTo(map);
   else accuracyCircle.setLatLng(latlng).setRadius(coords.accuracy || 20);
 
-  if (!routeLine) routeLine = L.polyline([latlng, targetLatLng], { className: 'route-line', weight: 3, dashArray: '4 9', interactive: false }).addTo(map);
+  if (!routeLine) routeLine = L.polyline([latlng, targetLatLng], {
+    className: 'route-line',
+    weight: 3,
+    dashArray: '4 9',
+    interactive: false,
+  }).addTo(map);
   else routeLine.setLatLngs([latlng, targetLatLng]);
 
   const distance = haversineMeters(here.latitude, here.longitude, currentTarget.latitude, currentTarget.longitude);
@@ -443,8 +496,17 @@ function startPolling() {
     pollHandle = setInterval(async () => {
       try {
         const fresh = await api('/api/status');
-        const changed = JSON.stringify({ step: fresh.currentStep, completedAt: fresh.completedAt, expired: fresh.expired }) !==
-          JSON.stringify({ step: state.currentStep, completedAt: state.completedAt, expired: state.expired });
+        const changed = JSON.stringify({
+          step: fresh.currentStep,
+          completedAt: fresh.completedAt,
+          expired: fresh.expired,
+          progress: fresh.progress,
+        }) !== JSON.stringify({
+          step: state.currentStep,
+          completedAt: state.completedAt,
+          expired: state.expired,
+          progress: state.progress,
+        });
         state = fresh;
         renderTimer();
         if (changed) render();
@@ -489,7 +551,7 @@ async function loadChat(markRead = false) {
           <time>${new Date(m.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}</time>
         </div>
       </div>`).join('')
-    : `<div class="chat-empty"><span>✦</span><p>Qui potete scrivervi durante la caccia.</p></div>`;
+    : `<div class="chat-empty"><p>Qui potete scrivervi durante la caccia.</p></div>`;
 
   const unreadAdmin = messages.filter((m) => m.sender === 'admin' && m.id > previousLast).length;
   if (chatOpen || markRead) {
@@ -531,5 +593,5 @@ chatInput.addEventListener('input', () => {
 });
 
 load().catch((err) => {
-  app.innerHTML = `<article class="story-card centered-card"><p class="eyebrow">ops</p><h1>Qualcosa non va.</h1><p class="lead">${esc(err.message)}</p></article>`;
+  app.innerHTML = `<article class="story-card centered-card"><p class="eyebrow">errore</p><h1>Qualcosa non va.</h1><p class="lead">${esc(err.message)}</p></article>`;
 });
