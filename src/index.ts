@@ -343,28 +343,48 @@ async function adminState(req: Request, env: Env) {
   return json({ game, score: scoreRow?.score || 0, maxScore: maxRow?.maxScore || 0, steps, attempts });
 }
 
+function publicPath(url: URL) {
+  if (url.pathname === "/auguri.html") return "/";
+  if (url.pathname === "/auguri" || url.pathname === "/auguri/") return "/";
+  if (url.pathname.startsWith("/auguri/")) return url.pathname.slice("/auguri".length) || "/";
+  return url.pathname;
+}
+
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url);
+    const path = publicPath(url);
 
-    if (url.pathname === "/api/status" && req.method === "GET") return status(env, await requireSession(req, env));
-    if (url.pathname === "/api/activate" && req.method === "POST") return activate(req, env);
-    if (url.pathname === "/api/chat" && req.method === "GET") return getChat(req, env);
-    if (url.pathname === "/api/chat" && req.method === "POST") return postPlayerChat(req, env);
+    if (path === "/api/status" && req.method === "GET") return status(env, await requireSession(req, env));
+    if (path === "/api/activate" && req.method === "POST") return activate(req, env);
+    if (path === "/api/chat" && req.method === "GET") return getChat(req, env);
+    if (path === "/api/chat" && req.method === "POST") return postPlayerChat(req, env);
 
-    const answerMatch = url.pathname.match(/^\/api\/steps\/(\d+)\/answer$/);
+    const answerMatch = path.match(/^\/api\/steps\/(\d+)\/answer$/);
     if (answerMatch && req.method === "POST") return answerStep(req, env, Number(answerMatch[1]));
 
-    const wordMatch = url.pathname.match(/^\/api\/steps\/(\d+)\/word$/);
+    const wordMatch = path.match(/^\/api\/steps\/(\d+)\/word$/);
     if (wordMatch && req.method === "POST") return verifyWord(req, env, Number(wordMatch[1]));
 
-    const lockerMatch = url.pathname.match(/^\/api\/steps\/(\d+)\/locker$/);
+    const lockerMatch = path.match(/^\/api\/steps\/(\d+)\/locker$/);
     if (lockerMatch && req.method === "POST") return revealLocker(req, env, Number(lockerMatch[1]));
 
-    if (url.pathname === "/api/admin/state" && req.method === "GET") return adminState(req, env);
-    if (url.pathname === "/api/admin/chat" && req.method === "GET") return getAdminChat(req, env);
-    if (url.pathname === "/api/admin/chat" && req.method === "POST") return postAdminChat(req, env);
-    if (url.pathname === "/api/admin/notify" && req.method === "POST") return postAdminChat(req, env);
+    if (path === "/api/admin/state" && req.method === "GET") return adminState(req, env);
+    if (path === "/api/admin/chat" && req.method === "GET") return getAdminChat(req, env);
+    if (path === "/api/admin/chat" && req.method === "POST") return postAdminChat(req, env);
+    if (path === "/api/admin/notify" && req.method === "POST") return postAdminChat(req, env);
+
+    if (url.pathname === "/auguri.html" || url.pathname === "/auguri" || url.pathname === "/auguri/") {
+      const assetUrl = new URL(req.url);
+      assetUrl.pathname = "/index.html";
+      return env.ASSETS.fetch(new Request(assetUrl.toString(), req));
+    }
+
+    if (url.pathname.startsWith("/auguri/")) {
+      const assetUrl = new URL(req.url);
+      assetUrl.pathname = path;
+      return env.ASSETS.fetch(new Request(assetUrl.toString(), req));
+    }
 
     return env.ASSETS.fetch(req);
   },
